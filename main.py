@@ -1,7 +1,7 @@
 from tweepy import OAuthHandler
 from tweepy import Stream
 
-import twitter_credentials
+from authentication import TwitterAuthenticator
 
 
 class StdOutListener(Stream):
@@ -31,14 +31,17 @@ class StdOutListener(Stream):
 
 class TwitterStream():
     """ 
-    class for processing tweets: connection to API VIA Stream
+    class for processing tweets: connection to API via Stream
 
     """
 
-    def stream_tweets(self, fetched_tweets_filename, key_word_list):
+    def __init__(self):
+        self.twitter_authenticator = TwitterAuthenticator()
 
-        stream = StdOutListener(twitter_credentials.CONSUMER_KEY, twitter_credentials.CONSUMER_SECRET,
-                                twitter_credentials.ACCESS_TOKEN, twitter_credentials.ACCESS_SECRET, fetched_tweets_filename)
+    def stream_tweets(self, fetched_tweets_filename, key_word_list):
+        auth = self.twitter_authenticator.authenticate_twitter_app()
+        stream = StdOutListener(auth.consumer_key, auth.consumer_secret,
+                                auth.access_token, auth.access_token_secret, fetched_tweets_filename)
         stream.filter(track=key_word_list)
 
 
