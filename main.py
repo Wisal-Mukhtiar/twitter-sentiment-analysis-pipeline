@@ -1,7 +1,22 @@
 from tweepy import OAuthHandler
 from tweepy import Stream
+from tweepy import Cursor
+from tweepy import API
 
 from authentication import TwitterAuthenticator
+
+
+class TwitterClient():
+
+    def __init__(self):
+        self.auth = TwitterAuthenticator().authenticate_twitter_app()
+        self.twitter_client = API(self.auth)
+
+    def get_user_timeline_tweet(self, num_tweets):
+        tweets = []
+        for tweet in Cursor(self.twitter_client.user_timeline).items(num_tweets):
+            tweets.append(tweet)
+        return tweets
 
 
 class StdOutListener(Stream):
@@ -26,6 +41,10 @@ class StdOutListener(Stream):
         return True
 
     def on_error(self, status):
+        # the status is returned when an app is rate limited for making too many requests.
+        if status == 402:
+            return False  # shuts the connection
+
         print(status)
 
 
@@ -49,5 +68,8 @@ if __name__ == "__main__":
     key_word_list = ['United States', 'Russia', 'Ukraine']
     fetched_tweets_filename = 'fetched_tweets.json'
 
-    twitter_streamer = TwitterStream()
-    twitter_streamer.stream_tweets(fetched_tweets_filename, key_word_list)
+    # twitter_streamer = TwitterStream()
+    # twitter_streamer.stream_tweets(fetched_tweets_filename, key_word_list)
+
+    twitter_client = TwitterClient()
+    print(twitter_client.get_user_timeline_tweet(5))
