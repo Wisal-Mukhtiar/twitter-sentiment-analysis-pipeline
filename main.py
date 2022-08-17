@@ -8,17 +8,29 @@ from authentication import TwitterAuthenticator
 
 class TwitterClient():
 
-    def __init__(self, twitter_user):
+    def __init__(self, twitter_user=None):
         self.auth = TwitterAuthenticator().authenticate_twitter_app()
         self.twitter_client = API(self.auth)
 
         self.twitter_user = twitter_user
 
-    def get_user_timeline_tweet(self, num_tweets):
+    def get_user_timeline_tweets(self, num_tweets):
         tweets = []
         for tweet in Cursor(self.twitter_client.user_timeline, user_id=self.twitter_user).items(num_tweets):
             tweets.append(tweet)
         return tweets
+
+    def get_friend_list(self, num_friends):
+        friend_list = []
+        for friend in Cursor(self.twitter_client.get_friends).items(num_friends):
+            friend_list.append(friend)
+        return friend_list
+
+    def get_home_timeline_tweets(self, num_tweets):
+        home_timline_tweets = []
+        for tweet in Cursor(self.twitter_client.home_timeline).items(num_tweets):
+            home_timline_tweets.append(tweet)
+        return home_timline_tweets
 
 
 class StdOutListener(Stream):
@@ -73,5 +85,5 @@ if __name__ == "__main__":
     # twitter_streamer = TwitterStream()
     # twitter_streamer.stream_tweets(fetched_tweets_filename, key_word_list)
 
-    twitter_client = TwitterClient('Pycon')
-    print(twitter_client.get_user_timeline_tweet(1))
+    twitter_client = TwitterClient()
+    print(twitter_client.get_home_timeline_tweets(1))
