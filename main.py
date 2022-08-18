@@ -4,6 +4,7 @@ from tweepy import Cursor
 from tweepy import API
 
 from authentication import TwitterAuthenticator
+from tweet_analyzer import TweetAnalyzer
 
 
 class TwitterClient():
@@ -11,8 +12,10 @@ class TwitterClient():
     def __init__(self, twitter_user=None):
         self.auth = TwitterAuthenticator().authenticate_twitter_app()
         self.twitter_client = API(self.auth)
-
         self.twitter_user = twitter_user
+
+    def get_twitter_client_api(self):
+        return self.twitter_client
 
     def get_user_timeline_tweets(self, num_tweets):
         tweets = []
@@ -79,11 +82,10 @@ class TwitterStream():
 
 
 if __name__ == "__main__":
-    key_word_list = ['United States', 'Russia', 'Ukraine']
-    fetched_tweets_filename = 'fetched_tweets.json'
-
-    # twitter_streamer = TwitterStream()
-    # twitter_streamer.stream_tweets(fetched_tweets_filename, key_word_list)
-
     twitter_client = TwitterClient()
-    print(twitter_client.get_home_timeline_tweets(1))
+    api = twitter_client.get_twitter_client_api()
+
+    tweets = api.user_timeline(screen_name='memesiwish', count=5)
+    tweets_analyzer = TweetAnalyzer()
+    df = tweets_analyzer.tweets_to_dataframe(tweets)
+    print(df)
