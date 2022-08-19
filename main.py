@@ -1,10 +1,7 @@
-import numpy as np
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy import Cursor
 from tweepy import API
-from tweepy.pagination import Paginator
-
 
 from authentication import TwitterAuthenticator
 from tweet_analyzer import TweetAnalyzer
@@ -42,7 +39,7 @@ class TwitterClient():
 class StdOutListener(Stream):
 
     """
-    base class processing the data and errors
+    base class processing the data and errors 
 
     """
 
@@ -69,7 +66,7 @@ class StdOutListener(Stream):
 
 
 class TwitterStream():
-    """
+    """ 
     class for processing tweets: connection to API via Stream
 
     """
@@ -88,9 +85,7 @@ if __name__ == "__main__":
     twitter_client = TwitterClient()
     api = twitter_client.get_twitter_client_api()
 
-    tweets = []
-    for tweet in Cursor(api.user_timeline, screen_name='JoeBiden').items(400):
-        tweets.append(tweet)
-
+    tweets = api.user_timeline(screen_name='memesiwish', count=5)
     tweets_analyzer = TweetAnalyzer()
     df = tweets_analyzer.tweets_to_dataframe(tweets)
+    print(df)
