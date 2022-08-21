@@ -1,7 +1,9 @@
+import numpy as np
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy import Cursor
 from tweepy import API
+from tweepy.pagination import Paginator
 
 from authentication import TwitterAuthenticator
 from tweet_analyzer import TweetAnalyzer
@@ -11,29 +13,40 @@ class TwitterClient():
 
     def __init__(self, twitter_user=None):
         self.auth = TwitterAuthenticator().authenticate_twitter_app()
-        self.twitter_client = API(self.auth)
+        self.twitter_api_client = API(self.auth)
         self.twitter_user = twitter_user
+        self.twitter_client = TwitterAuthenticator().get_twitter_client()
 
     def get_twitter_client_api(self):
+        return self.twitter_api_client
+
+    def get_twitter_client(self):
         return self.twitter_client
 
     def get_user_timeline_tweets(self, num_tweets):
         tweets = []
-        for tweet in Cursor(self.twitter_client.user_timeline, user_id=self.twitter_user).items(num_tweets):
+        for tweet in Cursor(self.twitter_api_client.user_timeline, user_id=self.twitter_user).items(num_tweets):
             tweets.append(tweet)
         return tweets
 
     def get_friend_list(self, num_friends):
         friend_list = []
-        for friend in Cursor(self.twitter_client.get_friends).items(num_friends):
+        for friend in Cursor(self.twitter_api_client.get_friends).items(num_friends):
             friend_list.append(friend)
         return friend_list
 
     def get_home_timeline_tweets(self, num_tweets):
         home_timline_tweets = []
-        for tweet in Cursor(self.twitter_client.home_timeline).items(num_tweets):
+        for tweet in Cursor(self.twitter_api_client.home_timeline).items(num_tweets):
             home_timline_tweets.append(tweet)
         return home_timline_tweets
+
+    def get_recent_tweets(self, topic, num_tweets):
+        recent_tweets = []
+        for tweet in Paginator(self.twitter_client.search_recent_tweets, topic,
+                               max_results=100, user_auth=True).flatten(num_tweets):
+            recent_tweets.append(tweet)
+        return recent_tweets
 
 
 class StdOutListener(Stream):
@@ -82,10 +95,9 @@ class TwitterStream():
 
 
 if __name__ == "__main__":
-    twitter_client = TwitterClient()
-    api = twitter_client.get_twitter_client_api()
-
-    tweets = api.user_timeline(screen_name='memesiwish', count=5)
+    twitter_client = TwitterClient('ImranKhanPTI')
+    # tweets = twitter_client.get_user_timeline_tweets(40)
+    tweets = twitter_client.get_recent_tweets(
+        'United States', 1)
     tweets_analyzer = TweetAnalyzer()
     df = tweets_analyzer.tweets_to_dataframe(tweets)
-    print(df)
