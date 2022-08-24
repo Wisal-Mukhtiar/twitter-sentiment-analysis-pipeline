@@ -1,5 +1,5 @@
 from tweepy import OAuthHandler
-
+from tweepy import Client
 import twitter_credentials
 
 
