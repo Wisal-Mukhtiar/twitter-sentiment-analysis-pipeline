@@ -48,6 +48,12 @@ class TwitterClient():
             recent_tweets.append(tweet)
         return recent_tweets
 
+    def get_tweets_by_keywords(self, keywords, num_tweets):
+        tweets_by_keywords = []
+        for tweet in Cursor(self.twitter_api_client.search_tweets, q=keywords).items(num_tweets):
+            tweets_by_keywords.append(tweet)
+        return tweets_by_keywords
+
 
 class StdOutListener(Stream):
 
@@ -95,9 +101,9 @@ class TwitterStream():
 
 
 if __name__ == "__main__":
-    twitter_client = TwitterClient('ImranKhanPTI')
+    twitter_client = TwitterClient()
     # tweets = twitter_client.get_user_timeline_tweets(40)
-    tweets = twitter_client.get_recent_tweets(
-        'United States', 1)
+    tweets = twitter_client.get_recent_tweets('Imrankhan', 20)
+
     tweets_analyzer = TweetAnalyzer()
     df = tweets_analyzer.tweets_to_dataframe(tweets)
