@@ -102,8 +102,7 @@ class TwitterStream():
 
 if __name__ == "__main__":
     twitter_client = TwitterClient()
-    # tweets = twitter_client.get_user_timeline_tweets(40)
-    tweets = twitter_client.get_recent_tweets('Imrankhan', 20)
+    tweets = twitter_client.get_tweets_by_keywords('Pakistan', 5)
 
     tweets_analyzer = TweetAnalyzer()
     df = tweets_analyzer.tweets_to_dataframe(tweets)
